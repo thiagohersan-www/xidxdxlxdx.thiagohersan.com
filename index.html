@@ -147,9 +147,27 @@
         document.getElementById(svgId).appendChild(tLine);
       }
 
-      function drawBezier(svgId, x1, y1, x2, y2, x3, y3, x4, y4) {
+      function drawBezier(svgId, x1, y1, x2, y2, x3, y3) {
         var tPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        var d = "M"+x1+" "+y1+" C "+x2+" "+y2+", "+x3+" "+y3+", "+x4+" "+y4;
+        var d = "M"+x1+" "+y1+" Q "+x2+" "+y2+", "+x3+" "+y3;
+        tPath.setAttributeNS(null, "d", d);
+        tPath.setAttributeNS(null, "style", GLYPH_STYLE);
+        document.getElementById(svgId).appendChild(tPath);
+      }
+
+      function drawSuperBezier(svgId, x1, y1, x2, y2, x3, y3, x4, y4, x5, y5) {
+        var tPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        var d = "M"+x1+" "+y1+ " Q "+x2+" "+y2+", "+x3+" "+y3;
+        d += " T "+x4+" "+y4+" T "+x5+" "+y5;
+        tPath.setAttributeNS(null, "d", d);
+        tPath.setAttributeNS(null, "style", GLYPH_STYLE);
+        document.getElementById(svgId).appendChild(tPath);
+      }
+
+      function drawArc(svgId, x1, y1, x2, y2, rx, ry) {
+        var tPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        var angle = 180 * Math.random();
+        var d = "M"+x1+" "+y1+ " A "+rx+" "+ry+" "+angle+" 0 1 "+x2+" "+y2;
         tPath.setAttributeNS(null, "d", d);
         tPath.setAttributeNS(null, "style", GLYPH_STYLE);
         document.getElementById(svgId).appendChild(tPath);
@@ -175,35 +193,38 @@
       function drawGlyphs(points) {
         if(points.length < 1) return;
 
-        var somePoints = [];
-        for(var i=0; i<10; i++) {
-          somePoints.push(points[Math.floor(points.length * Math.random())]);
-        }
-
-        var numberOfGlyphs = Math.floor(5 + 2 * Math.random());
+        var numberOfGlyphs = 5;
 
         for(var i=0; i<numberOfGlyphs; i++) {
           var tPoints = [];
-          for(var j=0; j<4; j++) {
-            tPoints.push(somePoints[Math.floor(somePoints.length * Math.random())]);
+          var firstPoint = Math.floor(points.length * Math.random());
+          for(var j=0; j<5; j++) {
+            tPoints.push(points[(firstPoint + j)%points.length]);
           }
 
           var mR = Math.random();
-          if (mR < 0.6) {
-            drawBezier('glyph-svg',
-                       tPoints[0].x, tPoints[0].y,
-                       tPoints[1].x, tPoints[1].y,
-                       tPoints[2].x, tPoints[2].y,
-                       tPoints[3].x, tPoints[3].y);
-          } else if (mR < 0.8) {
+          if (mR < 0.2) {
+            drawSuperBezier('glyph-svg',
+                            tPoints[0].x, tPoints[0].y,
+                            tPoints[1].x, tPoints[1].y,
+                            tPoints[2].x, tPoints[2].y,
+                            tPoints[3].x, tPoints[3].y,
+                            tPoints[4].x, tPoints[4].y);
+          } else if (mR < 0.5) {
             drawLine('glyph-svg',
                      tPoints[0].x, tPoints[0].y,
                      tPoints[1].x, tPoints[1].y);
-          } else {
+          } else if (mR < 0.8) {
             drawEllipse('glyph-svg',
                         tPoints[0].x, tPoints[0].y,
                         Math.abs(tPoints[0].x - tPoints[1].x)/2,
                         Math.abs(tPoints[0].y - tPoints[2].y)/2);
+          } else {
+            drawArc('glyph-svg',
+                    tPoints[0].x, tPoints[0].y,
+                    tPoints[1].x, tPoints[1].y,
+                    Math.abs(tPoints[0].x - tPoints[1].x)/2,
+                    Math.abs(tPoints[0].y - tPoints[2].y)/2);
           }
         }
 
