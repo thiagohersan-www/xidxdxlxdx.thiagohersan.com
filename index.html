@@ -68,10 +68,12 @@
       }
     </style>
 
+    <script src="js/Points.js"></script>
+
     <script>
       var map;
       var markers = [];
-      var mPoints = [];
+      var mPoints = Object.create(Points);
       var SP = {lat: -23.58010, lng: -46.62991};
       var DISTANCE_THRESHOLD = 10;
       var GLYPH_STYLE = "fill-opacity:0;stroke:#404040;stroke-width:6";
@@ -180,13 +182,14 @@
         var bottomLeft = projection.fromLatLngToPoint(bounds.getSouthWest());
         var scale = Math.pow(2, map.getZoom());
 
-        points.length = 0;
+        points.clear();
         for(var i=0; i<markers.length; i++) {
           var thisPoint = projection.fromLatLngToPoint(markers[i].getPosition());
-          var xy = {};
-          xy['x'] = Math.floor((thisPoint.x - bottomLeft.x) * scale);
-          xy['y'] = Math.floor((thisPoint.y - topRight.y) * scale);
-          points.push(xy);
+          var xy = {
+            x: Math.floor((thisPoint.x - bottomLeft.x) * scale),
+            y: Math.floor((thisPoint.y - topRight.y) * scale)
+          };
+          points.push(Object.create(Vector).set(xy.x, xy.y));
         }
       }
 
@@ -199,7 +202,7 @@
           var tPoints = [];
           var firstPoint = Math.floor(points.length * Math.random());
           for(var j=0; j<5; j++) {
-            tPoints.push(points[(firstPoint + j)%points.length]);
+            tPoints.push(points.get((firstPoint + j)%points.length));
           }
 
           var mR = Math.random();
