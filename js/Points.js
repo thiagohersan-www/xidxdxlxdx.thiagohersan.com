@@ -83,7 +83,14 @@ var Points = {
     this.averagePoint.setFromVector(sum.div(this.mPoints.length));
   },
   computeStandardDeviation: function() {
-    // TODO;
+    var variance = Object.create(Vector).set(0,0);
+    for(var i=0; i<this.mPoints.length; i++) {
+      var diff = Object.create(Vector).setFromVector(this.mPoints[i]);
+      diff.sub(this.averagePoint);
+      variance.add(Object.create(Vector).set(diff.x * diff.x, diff.y * diff.y));
+    }
+    variance.div(this.mPoints.length);
+    this.standardDeviation.set(Math.sqrt(variance.x), Math.sqrt(variance.y));
   },
   addToQuadrant: function(v, quad) {
     this.mQuadrants[quad].push(v);
