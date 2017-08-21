@@ -166,10 +166,13 @@
         document.getElementById(svgId).appendChild(tPath);
       }
 
-      function drawArc(svgId, x1, y1, x2, y2, rx, ry) {
+      function drawArc(svgId, x1, y1, x2, y2) {
         var tPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
         var angle = 180 * Math.random();
-        var d = "M"+x1+" "+y1+ " A "+rx+" "+ry+" "+angle+" 0 1 "+x2+" "+y2;
+        var dist = Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+        rx = dist/(1.5 + 0.5*Math.random());
+        ry = dist/(1.5 + 0.5*Math.random());
+        var d = "M"+x1+" "+y1+" A "+rx+" "+ry+" "+angle+" 0 0 "+x2+" "+y2;
         tPath.setAttributeNS(null, "d", d);
         tPath.setAttributeNS(null, "style", GLYPH_STYLE);
         document.getElementById(svgId).appendChild(tPath);
@@ -225,9 +228,7 @@
           } else {
             drawArc('glyph-svg',
                     tPoints[0].x, tPoints[0].y,
-                    tPoints[1].x, tPoints[1].y,
-                    Math.abs(tPoints[0].x - tPoints[1].x)/2,
-                    Math.abs(tPoints[0].y - tPoints[2].y)/2);
+                    tPoints[1].x, tPoints[1].y);
           }
         }
 
