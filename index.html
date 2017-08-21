@@ -76,7 +76,7 @@
       var mPoints = Object.create(Points);
       var SP = {lat: -23.58010, lng: -46.62991};
       var DISTANCE_THRESHOLD = 10;
-      var GLYPH_STYLE = "fill-opacity:0;stroke:#404040;stroke-width:6";
+      var GLYPH_STYLE = "fill-opacity:0;stroke:#404040;stroke-width:16";
       var MARKER_ICON;
 
       function initMap() {
@@ -129,38 +129,30 @@
         });
       }
 
-      function drawEllipse(svgId, cx, cy, rx, ry) {
+      function drawEllipse(svgId, center, radius) {
         var tEllipse = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
-        tEllipse.setAttributeNS(null, "cx", cx);
-        tEllipse.setAttributeNS(null, "cy", cy);
-        tEllipse.setAttributeNS(null, "rx", rx);
-        tEllipse.setAttributeNS(null, "ry", ry);
+        tEllipse.setAttributeNS(null, "cx", center.x);
+        tEllipse.setAttributeNS(null, "cy", center.y);
+        tEllipse.setAttributeNS(null, "rx", radius.x);
+        tEllipse.setAttributeNS(null, "ry", radius.y);
         tEllipse.setAttributeNS(null, "style", GLYPH_STYLE);
         document.getElementById(svgId).appendChild(tEllipse);
       }
 
-      function drawLine(svgId, x1, y1, x2, y2) {
+      function drawLine(svgId, p0, p1) {
         var tLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        tLine.setAttributeNS(null, "x1", x1);
-        tLine.setAttributeNS(null, "y1", y1);
-        tLine.setAttributeNS(null, "x2", x2);
-        tLine.setAttributeNS(null, "y2", y2);
+        tLine.setAttributeNS(null, "x1", p0.x);
+        tLine.setAttributeNS(null, "y1", p0.y);
+        tLine.setAttributeNS(null, "x2", p1.x);
+        tLine.setAttributeNS(null, "y2", p1.y);
         tLine.setAttributeNS(null, "style", GLYPH_STYLE);
         document.getElementById(svgId).appendChild(tLine);
       }
 
-      function drawBezier(svgId, x1, y1, x2, y2, x3, y3) {
+      function drawBezier(svgId, p0, p1, p2, p3, p4) {
         var tPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        var d = "M"+x1+" "+y1+" Q "+x2+" "+y2+", "+x3+" "+y3;
-        tPath.setAttributeNS(null, "d", d);
-        tPath.setAttributeNS(null, "style", GLYPH_STYLE);
-        document.getElementById(svgId).appendChild(tPath);
-      }
-
-      function drawSuperBezier(svgId, x1, y1, x2, y2, x3, y3, x4, y4, x5, y5) {
-        var tPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        var d = "M"+x1+" "+y1+ " Q "+x2+" "+y2+", "+x3+" "+y3;
-        d += " T "+x4+" "+y4+" T "+x5+" "+y5;
+        var d = "M"+p0.x+" "+p0.y+ " Q "+p1.x+" "+p1.y+", "+p2.x+" "+p2.y;
+        d += " T "+p3.x+" "+p3.y+" T "+p4.x+" "+p4.y;
         tPath.setAttributeNS(null, "d", d);
         tPath.setAttributeNS(null, "style", GLYPH_STYLE);
         document.getElementById(svgId).appendChild(tPath);
@@ -196,41 +188,61 @@
         }
       }
 
+      function deterministicGlyphs(points) {
+        var average = points.averagePoint;
+        var stdDev = points.standardDeviation;
+        var median = points.medianPoint;
+        var topMajorMedian = points.quadrantMedian[points.majorTopQuadrant];
+        var bottomMajorMedian = points.quadrantMedian[points.majorBottomQuadrant];
+        var topMajorNearest = points.quadrantMinDistance[points.majorTopQuadrant];
+        var bottomMajorNearest = points.quadrantMinDistance[points.majorBottomQuadrant];
+        var topMajorFurthest = points.quadrantMaxDistance[points.majorTopQuadrant];
+        var bottomMajorFurthest = points.quadrantMaxDistance[points.majorBottomQuadrant];
+
+        var topMinorMedian = points.quadrantMedian[points.minorTopQuadrant];
+        var bottomMinorMedian = points.quadrantMedian[points.minorBottomQuadrant];
+        var topMinorNearest = points.quadrantMinDistance[points.minorTopQuadrant];
+        var bottomMinorNearest = points.quadrantMinDistance[points.minorBottomQuadrant];
+        var topMinorFurthest = points.quadrantMaxDistance[points.minorTopQuadrant];
+        var bottomMinorFurthest = points.quadrantMaxDistance[points.minorBottomQuadrant];
+
+        drawBezier('glyph-svg',
+                   topMajorMedian,
+                   topMajorNearest,
+                   average,
+                   bottomMajorNearest,
+                   bottomMajorMedian);
+        drawEllipse('glyph-svg',
+                    topMajorMedian,
+                    {x: Math.abs(topMajorMedian.x - topMajorNearest.x),
+                     y: Math.abs(topMajorMedian.y - topMajorFurthest.y)});
+        drawEllipse('glyph-svg',
+                    bottomMajorMedian,
+                    {x: Math.abs(bottomMajorMedian.x - bottomMajorNearest.x),
+                     y: Math.abs(bottomMajorMedian.y - bottomMajorFurthest.y)});
+
+        drawBezier('glyph-svg',
+                   topMinorFurthest,
+                   topMinorNearest,
+                   topMinorNearest,
+                   bottomMinorNearest,
+                   bottomMinorFurthest);
+        drawEllipse('glyph-svg',
+                    topMinorMedian,
+                    {x: Math.abs(topMinorMedian.x - topMinorNearest.x),
+                     y: Math.abs(topMinorMedian.y - topMinorFurthest.y)});
+        drawEllipse('glyph-svg',
+                    bottomMinorMedian,
+                    {x: Math.abs(bottomMinorMedian.x - bottomMinorNearest.x),
+                     y: Math.abs(bottomMinorMedian.y - bottomMinorFurthest.y)});
+
+        drawLine('glyph-svg', bottomMinorNearest, topMajorFurthest);
+      }
+
       function drawGlyphs(points) {
         if(points.length < 1) return;
 
-        var numberOfGlyphs = 5;
-
-        for(var i=0; i<numberOfGlyphs; i++) {
-          var tPoints = [];
-          var firstPoint = Math.floor(points.length * Math.random());
-          for(var j=0; j<5; j++) {
-            tPoints.push(points.get((firstPoint + j)%points.length));
-          }
-
-          var mR = Math.random();
-          if (mR < 0.2) {
-            drawSuperBezier('glyph-svg',
-                            tPoints[0].x, tPoints[0].y,
-                            tPoints[1].x, tPoints[1].y,
-                            tPoints[2].x, tPoints[2].y,
-                            tPoints[3].x, tPoints[3].y,
-                            tPoints[4].x, tPoints[4].y);
-          } else if (mR < 0.5) {
-            drawLine('glyph-svg',
-                     tPoints[0].x, tPoints[0].y,
-                     tPoints[1].x, tPoints[1].y);
-          } else if (mR < 0.8) {
-            drawEllipse('glyph-svg',
-                        tPoints[0].x, tPoints[0].y,
-                        Math.abs(tPoints[0].x - tPoints[1].x)/2,
-                        Math.abs(tPoints[0].y - tPoints[2].y)/2);
-          } else {
-            drawArc('glyph-svg',
-                    tPoints[0].x, tPoints[0].y,
-                    tPoints[1].x, tPoints[1].y);
-          }
-        }
+        deterministicGlyphs(points);
 
         // http://stackoverflow.com/questions/2483919/how-to-save-svg-canvas-to-local-filesystem
         var svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">';

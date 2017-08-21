@@ -36,7 +36,12 @@ var Points = {
   length: 0,
   sumOfPoints: Object.create(Vector).set(0,0),
   averagePoint: Object.create(Vector).set(0,0),
+  medianPoint: Object.create(Vector).set(0,0),
   standardDeviation: Object.create(Vector).set(0,0),
+  majorTopQuadrant: 0,
+  minorTopQuadrant: 0,
+  majorBottomQuadrant: 0,
+  minorBottomQuadrant: 0,
 
   mQuadrants: [ [], [], [], [] ],
   quadrantMinDistance: [Object.create(Vector).set(0,0),
@@ -53,7 +58,7 @@ var Points = {
                    Object.create(Vector).set(0,0)],
 
   mColors: ['#ff55ff', '#ffff55', '#55ff55', '#55ffff'],
-  
+
   get: function(i) {
     return this.mPoints[i];
   },
@@ -81,6 +86,14 @@ var Points = {
   computeAverage: function() {
     var sum = Object.create(Vector).setFromVector(this.sumOfPoints);
     this.averagePoint.setFromVector(sum.div(this.mPoints.length));
+  },
+  computeMedian: function() {
+    this.medianPoint.set(1e6, 1e6);
+    for(var i=0; i<this.mPoints.length; i++) {
+      if(this.averagePoint.distSq(this.mPoints[i]) < this.averagePoint.distSq(this.medianPoint)) {
+        this.medianPoint.setFromVector(this.mPoints[i]);
+      }
+    }
   },
   computeStandardDeviation: function() {
     var variance = Object.create(Vector).set(0,0);
@@ -154,8 +167,14 @@ var Points = {
   },
   update: function() {
     this.computeAverage();
+    this.computeMedian();
     this.computeStandardDeviation();
     this.splitIntoQuadrants();
     this.computeAllQuadrantMedians();
+
+    this.majorTopQuadrant = (this.mQuadrants[0].length > this.mQuadrants[1].length)?0:1;
+    this.minorTopQuadrant = (this.majorTopQuadrant == 0)?1:0;
+    this.majorBottomQuadrant = (this.mQuadrants[2].length > this.mQuadrants[3].length)?2:3;
+    this.minorBottomQuadrant = (this.majorBottomQuadrant == 2)?3:2;
   }
 };
