@@ -49,6 +49,9 @@
           ]
         });
 
+        map.addListener('zoom_changed', redrawGlyph);
+        map.addListener('center_changed', redrawGlyph);
+
         map.addListener('click', function(event) {
           var cPos = event.latLng;
 
@@ -67,13 +70,13 @@
                   break;
                 }
               }
-              generateGlyph();
+              centerGlyph();
             };
           }
 
           marker.addListener('click', deleteMarker(marker));
           markers.push(marker);
-          generateGlyph();
+          centerGlyph();
         });
       }
 
@@ -84,6 +87,12 @@
         markers = [];
       }
 
+      function redrawGlyph() {
+        document.getElementById("glyph-svg").innerHTML = '';
+        fromLatLngToPoint(markers, mPoints);
+        drawDeterministicGlyphs(mPoints);
+      }
+
       function clearGlyph() {
         document.getElementById("clear-button").style['display'] = 'none';
         document.getElementById("download-button").style['display'] = 'none';
@@ -91,36 +100,21 @@
         deleteAllMarkers();
       }
 
-      function generateGlyph() {
+      function centerGlyph() {
         document.getElementById("clear-button").style['display'] = 'block';
         document.getElementById("download-button").style['display'] = 'block';
-        document.getElementById("glyph-svg").innerHTML = '';
-
-        var originalBounds = map.getBounds();
 
         var bounds = new google.maps.LatLngBounds();
         for(var i=0; i<markers.length; i++) {
           bounds.extend(markers[i].getPosition());
         }
 
-        google.maps.event.addListenerOnce(map, 'bounds_changed', function(event) {
-          if(this.getZoom() > 15) {
-            this.setZoom(15);
-          }
-          fromLatLngToPoint(markers, mPoints);
-          drawDeterministicGlyphs(mPoints);
-        });
-
         if(markers.length > 4) {
           map.fitBounds(bounds);
+          redrawGlyph();
         } else {
           map.setCenter(SP);
           map.setZoom(12);
-        }
-
-        if(originalBounds.equals(map.getBounds())) {
-          fromLatLngToPoint(markers, mPoints);
-          drawDeterministicGlyphs(mPoints);
         }
       }
 
@@ -220,7 +214,7 @@
   <body>
     <div id="floating-panel">
       <!--
-      <div id="draw-button" class="button" onclick="generateGlyph();">
+      <div id="draw-button" class="button" onclick="function();">
         <i id="draw-icon" class="fa fa-repeat fa-2x" aria-hidden="true"></i>
       </div>
       -->
