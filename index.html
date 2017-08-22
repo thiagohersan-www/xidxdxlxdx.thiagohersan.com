@@ -98,6 +98,8 @@
         document.getElementById("download-button").style['display'] = 'none';
         document.getElementById("glyph-svg").innerHTML = '';
         deleteAllMarkers();
+        map.setCenter(SP);
+        map.setZoom(12);
       }
 
       function centerGlyph() {
@@ -111,11 +113,8 @@
 
         if(markers.length > 4) {
           map.fitBounds(bounds);
-          redrawGlyph();
-        } else {
-          map.setCenter(SP);
-          map.setZoom(12);
         }
+        redrawGlyph();
       }
 
       function drawDeterministicGlyphs(points) {
