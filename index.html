@@ -21,6 +21,7 @@
       var mPoints = Object.create(Points);
       var SP = {lat: -23.58010, lng: -46.62991};
       var DISTANCE_THRESHOLD = 10;
+      var RADIUS_THRESHOLD = 20;
       var GLYPH_STYLE = "fill-opacity:0;stroke:#404040;stroke-width:16";
       var MARKER_ICON;
 
@@ -136,6 +137,14 @@
         var topMajorFurthest = points.quadrantMaxDistance[points.majorTopQuadrant];
         var bottomMajorFurthest = points.quadrantMaxDistance[points.majorBottomQuadrant];
 
+        var topMajorRadius = Object.create(Vector).set(
+          Math.abs(topMajorMedian.x - topMajorNearest.x),
+          Math.abs(topMajorMedian.y - topMajorFurthest.y));
+
+        var bottomMajorRadius = Object.create(Vector).set(
+          Math.abs(bottomMajorMedian.x - bottomMajorNearest.x),
+          Math.abs(bottomMajorMedian.y - bottomMajorFurthest.y));
+
         var topMinorMedian = points.quadrantMedian[points.minorTopQuadrant];
         var bottomMinorMedian = points.quadrantMedian[points.minorBottomQuadrant];
         var topMinorNearest = points.quadrantMinDistance[points.minorTopQuadrant];
@@ -143,37 +152,44 @@
         var topMinorFurthest = points.quadrantMaxDistance[points.minorTopQuadrant];
         var bottomMinorFurthest = points.quadrantMaxDistance[points.minorBottomQuadrant];
 
+        var minLengthQuadrantMedian = points.quadrantMedian[points.minLengthQuadrant];
+        var minLengthQuadrantNearest = points.quadrantMinDistance[points.minLengthQuadrant];
+        var minLengthQuadrantFurthest = points.quadrantMaxDistance[points.minLengthQuadrant];
+
+        var topMinorRadius = Object.create(Vector).set(
+          Math.abs(topMinorMedian.x - topMinorNearest.x),
+          Math.abs(topMinorMedian.y - topMinorFurthest.y));
+
+        var bottomMinorRadius = Object.create(Vector).set(
+          Math.abs(bottomMinorMedian.x - bottomMinorNearest.x),
+          Math.abs(bottomMinorMedian.y - bottomMinorFurthest.y));
+
+
         svgBezier('glyph-svg',
                   topMajorMedian,
                   topMajorNearest,
                   average,
                   bottomMajorNearest,
                   bottomMajorMedian);
-        svgEllipse('glyph-svg',
-                   topMajorMedian,
-                   {x: Math.abs(topMajorMedian.x - topMajorNearest.x),
-                    y: Math.abs(topMajorMedian.y - topMajorFurthest.y)});
-        svgEllipse('glyph-svg',
-                   bottomMajorMedian,
-                   {x: Math.abs(bottomMajorMedian.x - bottomMajorNearest.x),
-                    y: Math.abs(bottomMajorMedian.y - bottomMajorFurthest.y)});
 
-        svgBezier('glyph-svg',
-                  topMinorFurthest,
-                  topMinorNearest,
-                  topMinorNearest,
-                  bottomMinorNearest,
-                  bottomMinorFurthest);
-        svgEllipse('glyph-svg',
-                   topMinorMedian,
-                   {x: Math.abs(topMinorMedian.x - topMinorNearest.x),
-                    y: Math.abs(topMinorMedian.y - topMinorFurthest.y)});
-        svgEllipse('glyph-svg',
-                   bottomMinorMedian,
-                   {x: Math.abs(bottomMinorMedian.x - bottomMinorNearest.x),
-                    y: Math.abs(bottomMinorMedian.y - bottomMinorFurthest.y)});
+        if(topMajorRadius.x > RADIUS_THRESHOLD && topMajorRadius.y > RADIUS_THRESHOLD) {
+          svgEllipse('glyph-svg', topMajorMedian, topMajorRadius);
+        }
+        if(bottomMajorRadius.x > RADIUS_THRESHOLD && bottomMajorRadius.y > RADIUS_THRESHOLD) {
+          svgEllipse('glyph-svg', bottomMajorMedian, bottomMajorRadius);
+        }
 
-        svgLine('glyph-svg', bottomMinorNearest, topMajorFurthest);
+        if(topMinorRadius.x > RADIUS_THRESHOLD && topMinorRadius.y > RADIUS_THRESHOLD) {
+          svgEllipse('glyph-svg', topMinorMedian, topMinorRadius);
+        }
+        if(bottomMinorRadius.x > RADIUS_THRESHOLD && bottomMinorRadius.y > RADIUS_THRESHOLD) {
+          svgEllipse('glyph-svg', bottomMinorMedian, bottomMinorRadius);
+        }
+
+        svgLine('glyph-svg', bottomMinorFurthest, topMajorFurthest);
+        svgLine('glyph-svg', bottomMajorFurthest, topMinorFurthest);
+
+        svgArc('glyph-svg', minLengthQuadrantNearest, minLengthQuadrantFurthest);
 
         // http://stackoverflow.com/questions/2483919/how-to-save-svg-canvas-to-local-filesystem
         var svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">';

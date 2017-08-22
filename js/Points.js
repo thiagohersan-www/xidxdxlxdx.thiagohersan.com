@@ -42,6 +42,8 @@ var Points = {
   minorTopQuadrant: 0,
   majorBottomQuadrant: 0,
   minorBottomQuadrant: 0,
+  quadrantLength: [0, 0, 0, 0],
+  minLengthQuadrant: 0,
 
   mQuadrants: [ [], [], [], [] ],
   quadrantMinDistance: [Object.create(Vector).set(0,0),
@@ -107,6 +109,7 @@ var Points = {
   },
   addToQuadrant: function(v, quad) {
     this.mQuadrants[quad].push(v);
+    this.quadrantLength[quad] = this.mQuadrants[quad].length;
 
     var thisDistance = this.averagePoint.distSq(v);
     var currentMinDistance = this.averagePoint.distSq(this.quadrantMinDistance[quad]);
@@ -122,6 +125,7 @@ var Points = {
   splitIntoQuadrants: function() {
     for(var i=0; i<this.mQuadrants.length; i++) {
       this.mQuadrants[i] = [];
+      this.quadrantLength[i] = this.mQuadrants[i].length;
       this.quadrantMinDistance[i].set(1e6, 1e6);
       this.quadrantMaxDistance[i].setFromVector(this.averagePoint);
     }
@@ -176,5 +180,7 @@ var Points = {
     this.minorTopQuadrant = (this.majorTopQuadrant == 0)?1:0;
     this.majorBottomQuadrant = (this.mQuadrants[2].length > this.mQuadrants[3].length)?2:3;
     this.minorBottomQuadrant = (this.majorBottomQuadrant == 2)?3:2;
+
+    this.minLengthQuadrant = (this.quadrantLength[this.minorTopQuadrant] < this.quadrantLength[this.minorBottomQuadrant])?this.minorTopQuadrant:this.minorBottomQuadrant;
   }
 };
