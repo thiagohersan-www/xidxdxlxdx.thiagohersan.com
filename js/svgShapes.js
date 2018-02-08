@@ -1,12 +1,17 @@
-function svgEllipse(svgId, center, radius) {
+function svgEllipse(svgId, center, width, height) {
   var tEllipse = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
-  var radius = Math.min(radius.x, radius.y);
+  var mWidth = Math.max(MIN_RADIUS, Math.min(width.x, width.y));
+  var mHeight = Math.max(MIN_RADIUS, Math.min(height.x, height.y));
   tEllipse.setAttributeNS(null, "cx", center.x);
   tEllipse.setAttributeNS(null, "cy", center.y);
-  tEllipse.setAttributeNS(null, "rx", radius);
-  tEllipse.setAttributeNS(null, "ry", radius);
+  tEllipse.setAttributeNS(null, "rx", mWidth);
+  tEllipse.setAttributeNS(null, "ry", mHeight);
   tEllipse.setAttributeNS(null, "style", GLYPH_STYLE);
   document.getElementById(svgId).appendChild(tEllipse);
+}
+
+function svgCircle(svgId, center, radius) {
+  svgEllipse(svgId, center, radius, radius);
 }
 
 function svgLine(svgId, p0, p1) {
