@@ -158,39 +158,32 @@
           Math.abs(bottomMinorMedian.x - bottomMinorFurthest.x),
           Math.abs(bottomMinorMedian.y - bottomMinorFurthest.y));
 
-
-        svgBezier('glyph-svg',
-                  topMajorMedian,
-                  topMajorNearest,
-                  average,
-                  bottomMajorNearest,
-                  bottomMajorMedian);
-
         if(points.quadrantLength[points.majorTopQuadrant] >
            points.quadrantLength[points.majorBottomQuadrant]) {
-          svgCircle('glyph-svg', topMajorMedian, topMajorRadius);
+          svgArc('glyph-svg', topMajorMedian, topMinorNearest);
         } else {
-          svgCircle('glyph-svg', bottomMajorMedian, bottomMajorRadius);
+          svgArc('glyph-svg', bottomMajorMedian, bottomMinorNearest);
         }
 
         if(points.quadrantLength[points.minorTopQuadrant] >
            points.quadrantLength[points.minorBottomQuadrant]) {
-          svgCircle('glyph-svg', topMinorMedian, topMinorRadius);
+          svgArc('glyph-svg', topMinorMedian, topMajorFurthest);
         } else {
-          svgCircle('glyph-svg', bottomMinorMedian, bottomMinorRadius);
+          svgArc('glyph-svg', bottomMinorMedian, bottomMajorFurthest);
         }
 
-        if(points.quadrantLength[points.majorTopQuadrant] > 3) {
-          svgEllipse('glyph-svg', topMajorMedian, topMajorRadius, topMinorRadius);
-        }
-        if(points.quadrantLength[points.majorBottomQuadrant] > 3) {
-          svgEllipse('glyph-svg', bottomMajorMedian, bottomMajorRadius, bottomMinorRadius);
-        }
+        svgEllipse('glyph-svg', topMajorMedian, topMajorRadius, topMinorRadius);
+        svgEllipse('glyph-svg', bottomMajorMedian, bottomMajorRadius, bottomMinorRadius);
 
         svgLine('glyph-svg', topMajorMedian, bottomMajorMedian);
         svgLine('glyph-svg', topMajorMedian, bottomMinorMedian);
 
-        svgArc('glyph-svg', minLengthQuadrantNearest, minLengthQuadrantFurthest);
+        if(points.quadrantLength[points.majorTopQuadrant] > 3) {
+          svgEllipse('glyph-svg', topMajorMedian, topMajorRadius, bottomMajorRadius);
+        }
+        if(points.quadrantLength[points.majorBottomQuadrant] > 3) {
+          svgEllipse('glyph-svg', bottomMajorMedian, topMinorRadius, bottomMinorRadius);
+        }
 
         // http://stackoverflow.com/questions/2483919/how-to-save-svg-canvas-to-local-filesystem
         var svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">';
