@@ -119,7 +119,7 @@
       }
 
       function drawDeterministicGlyphs(points) {
-        if(points.length < 5) return;
+        if(points.length() < 5) return;
 
         var average = points.averagePoint;
         var stdDev = points.standardDeviation;
@@ -146,10 +146,6 @@
         var topMinorFurthest = points.quadrantMaxDistance[points.minorTopQuadrant];
         var bottomMinorFurthest = points.quadrantMaxDistance[points.minorBottomQuadrant];
 
-        var minLengthQuadrantMedian = points.quadrantMedian[points.minLengthQuadrant];
-        var minLengthQuadrantNearest = points.quadrantMinDistance[points.minLengthQuadrant];
-        var minLengthQuadrantFurthest = points.quadrantMaxDistance[points.minLengthQuadrant];
-
         var topMinorRadius = Object.create(Vector).set(
           Math.abs(topMinorMedian.x - topMinorFurthest.x),
           Math.abs(topMinorMedian.y - topMinorFurthest.y));
@@ -157,6 +153,13 @@
         var bottomMinorRadius = Object.create(Vector).set(
           Math.abs(bottomMinorMedian.x - bottomMinorFurthest.x),
           Math.abs(bottomMinorMedian.y - bottomMinorFurthest.y));
+
+        svgBezier('glyph-svg',
+                  topMinorFurthest,
+                  topMinorMedian,
+                  average,
+                  bottomMinorFurthest,
+                  bottomMinorMedian);
 
         if(points.quadrantLength[points.majorTopQuadrant] >
            points.quadrantLength[points.majorBottomQuadrant]) {

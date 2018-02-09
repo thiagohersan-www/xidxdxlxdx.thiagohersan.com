@@ -33,7 +33,6 @@ var Vector = {
 
 var Points = {
   mPoints: [],
-  length: 0,
   sumOfPoints: Object.create(Vector).set(0,0),
   averagePoint: Object.create(Vector).set(0,0),
   medianPoint: Object.create(Vector).set(0,0),
@@ -43,7 +42,6 @@ var Points = {
   majorBottomQuadrant: 0,
   minorBottomQuadrant: 0,
   quadrantLength: [0, 0, 0, 0],
-  minLengthQuadrant: 0,
 
   mQuadrants: [ [], [], [], [] ],
   quadrantMinDistance: [Object.create(Vector).set(0,0),
@@ -67,23 +65,23 @@ var Points = {
   push: function(xy) {
     this.sumOfPoints.add(xy);
     this.mPoints.push(xy);
-    this.length = this.mPoints.length;
     this.update();
   },
   remove: function(i) {
     this.sumOfPoints.sub(xy);
     this.mPoints.splice(i, 1);
-    this.length = this.mPoints.length;
     this.update();
   },
   clear: function() {
     this.sumOfPoints.set(0,0);
     this.mPoints = [];
-    this.length = this.mPoints.length;
     this.update;
   },
+  length: function() {
+    return this.mPoints.length;
+  },
   isEmpty: function() {
-    return (this.length < 1);
+    return (this.mPoints.length < 1);
   },
   computeAverage: function() {
     var sum = Object.create(Vector).setFromVector(this.sumOfPoints);
@@ -180,7 +178,5 @@ var Points = {
     this.minorTopQuadrant = (this.majorTopQuadrant == 0)?1:0;
     this.majorBottomQuadrant = (this.mQuadrants[2].length > this.mQuadrants[3].length)?2:3;
     this.minorBottomQuadrant = (this.majorBottomQuadrant == 2)?3:2;
-
-    this.minLengthQuadrant = (this.quadrantLength[this.minorTopQuadrant] < this.quadrantLength[this.minorBottomQuadrant])?this.minorTopQuadrant:this.minorBottomQuadrant;
   }
 };
