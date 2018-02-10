@@ -22,7 +22,6 @@
       var SP = {lat: -23.58010, lng: -46.62991};
       var DISTANCE_THRESHOLD = 10;
       var RADIUS_THRESHOLD = 10;
-      var MIN_RADIUS = 50;
       var GLYPH_STYLE = "fill-opacity:0;stroke:#404040;stroke-width:4";
       var MARKER_ICON;
 
@@ -122,13 +121,13 @@
         if(points.length() < 5) return;
 
         var average = points.averagePoint;
-        var stdDev = points.standardDeviation;
-        var median = points.medianPoint;
+
         var topMajorMedian = points.quadrantMedian[points.majorTopQuadrant];
-        var bottomMajorMedian = points.quadrantMedian[points.majorBottomQuadrant];
         var topMajorNearest = points.quadrantMinDistance[points.majorTopQuadrant];
-        var bottomMajorNearest = points.quadrantMinDistance[points.majorBottomQuadrant];
         var topMajorFurthest = points.quadrantMaxDistance[points.majorTopQuadrant];
+
+        var bottomMajorMedian = points.quadrantMedian[points.majorBottomQuadrant];
+        var bottomMajorNearest = points.quadrantMinDistance[points.majorBottomQuadrant];
         var bottomMajorFurthest = points.quadrantMaxDistance[points.majorBottomQuadrant];
 
         var topMajorRadius = Object.create(Vector).set(
@@ -140,10 +139,11 @@
           Math.abs(bottomMajorMedian.y - bottomMajorFurthest.y));
 
         var topMinorMedian = points.quadrantMedian[points.minorTopQuadrant];
-        var bottomMinorMedian = points.quadrantMedian[points.minorBottomQuadrant];
         var topMinorNearest = points.quadrantMinDistance[points.minorTopQuadrant];
-        var bottomMinorNearest = points.quadrantMinDistance[points.minorBottomQuadrant];
         var topMinorFurthest = points.quadrantMaxDistance[points.minorTopQuadrant];
+
+        var bottomMinorMedian = points.quadrantMedian[points.minorBottomQuadrant];
+        var bottomMinorNearest = points.quadrantMinDistance[points.minorBottomQuadrant];
         var bottomMinorFurthest = points.quadrantMaxDistance[points.minorBottomQuadrant];
 
         var topMinorRadius = Object.create(Vector).set(
@@ -163,30 +163,14 @@
 
         if(points.quadrantLength[points.majorTopQuadrant] >
            points.quadrantLength[points.majorBottomQuadrant]) {
-          svgArc('glyph-svg', topMajorMedian, topMinorNearest);
+          svgArc('glyph-svg', topMinorFurthest, bottomMinorNearest);
         } else {
-          svgArc('glyph-svg', bottomMajorMedian, bottomMinorNearest);
+          svgArc('glyph-svg', bottomMinorFurthest, bottomMinorNearest);
         }
 
-        if(points.quadrantLength[points.minorTopQuadrant] >
-           points.quadrantLength[points.minorBottomQuadrant]) {
-          svgArc('glyph-svg', topMinorMedian, topMajorFurthest);
-        } else {
-          svgArc('glyph-svg', bottomMinorMedian, bottomMajorFurthest);
-        }
-
-        svgEllipse('glyph-svg', topMajorMedian, topMajorRadius, topMinorRadius);
-        svgEllipse('glyph-svg', bottomMajorMedian, bottomMajorRadius, bottomMinorRadius);
-
-        svgLine('glyph-svg', topMajorMedian, bottomMajorMedian);
-        svgLine('glyph-svg', topMajorMedian, bottomMinorMedian);
-
-        if(points.quadrantLength[points.majorTopQuadrant] > 3) {
-          svgEllipse('glyph-svg', topMajorMedian, topMajorRadius, bottomMajorRadius);
-        }
-        if(points.quadrantLength[points.majorBottomQuadrant] > 3) {
-          svgEllipse('glyph-svg', bottomMajorMedian, topMinorRadius, bottomMinorRadius);
-        }
+        svgLine('glyph-svg', bottomMinorNearest, bottomMajorNearest);
+        svgEllipse('glyph-svg', bottomMinorMedian, bottomMinorRadius, topMinorRadius);
+        svgEllipse('glyph-svg', topMinorFurthest, topMinorRadius, topMinorRadius);
 
         // http://stackoverflow.com/questions/2483919/how-to-save-svg-canvas-to-local-filesystem
         var svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">';

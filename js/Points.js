@@ -57,8 +57,6 @@ var Points = {
                    Object.create(Vector).set(0,0),
                    Object.create(Vector).set(0,0)],
 
-  mColors: ['#ff55ff', '#ffff55', '#55ff55', '#55ffff'],
-
   get: function(i) {
     return this.mPoints[i];
   },
@@ -167,6 +165,7 @@ var Points = {
       this.computeQuadrantMedian(i);
     }
   },
+
   update: function() {
     this.computeAverage();
     this.computeMedian();

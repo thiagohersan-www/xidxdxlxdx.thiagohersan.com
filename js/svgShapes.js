@@ -1,7 +1,7 @@
 function svgEllipse(svgId, center, width, height) {
   var tEllipse = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
-  var mWidth = Math.max(MIN_RADIUS, Math.min(width.x, width.y));
-  var mHeight = Math.max(MIN_RADIUS, Math.min(height.x, height.y));
+  var mWidth = Math.min(width.x, width.y);
+  var mHeight = Math.min(height.x, height.y);
   tEllipse.setAttributeNS(null, "cx", center.x);
   tEllipse.setAttributeNS(null, "cy", center.y);
   tEllipse.setAttributeNS(null, "rx", mWidth);
