@@ -22,7 +22,7 @@
       var SP = {lat: -23.58010, lng: -46.62991};
       var DISTANCE_THRESHOLD = 10;
       var RADIUS_THRESHOLD = 10;
-      var GLYPH_STYLE = "fill-opacity:0;stroke:#404040;stroke-width:4";
+      var GLYPH_STYLE = "fill-opacity:0;stroke:#404040;stroke-width:6";
       var MARKER_ICON;
 
       function initMap() {
@@ -154,23 +154,27 @@
           Math.abs(bottomMinorMedian.x - bottomMinorFurthest.x),
           Math.abs(bottomMinorMedian.y - bottomMinorFurthest.y));
 
+        // minor
         svgBezier('glyph-svg',
-                  topMinorFurthest,
+                  topMinorNearest,
                   topMinorMedian,
                   average,
-                  bottomMinorFurthest,
+                  bottomMinorNearest,
                   bottomMinorMedian);
 
-        if(points.quadrantLength[points.topMajorQuadrant] >
-           points.quadrantLength[points.bottomMajorQuadrant]) {
-          svgArc('glyph-svg', topMinorFurthest, bottomMinorNearest);
-        } else {
-          svgArc('glyph-svg', bottomMinorFurthest, bottomMinorNearest);
-        }
+        svgLine('glyph-svg', bottomMinorMedian, topMinorFurthest);
+        svgCircle('glyph-svg', topMinorFurthest, topMinorRadius);
 
-        svgLine('glyph-svg', bottomMinorNearest, bottomMajorNearest);
-        svgEllipse('glyph-svg', bottomMinorMedian, bottomMinorRadius, topMinorRadius);
-        svgEllipse('glyph-svg', topMinorFurthest, topMinorRadius, topMinorRadius);
+        // major
+        svgBezier('glyph-svg',
+                  topMajorNearest,
+                  topMajorMedian,
+                  average,
+                  bottomMajorNearest,
+                  bottomMajorMedian);
+
+        svgLine('glyph-svg', bottomMajorFurthest, topMajorNearest);
+        svgCircle('glyph-svg', topMajorNearest, topMajorRadius);
 
         // http://stackoverflow.com/questions/2483919/how-to-save-svg-canvas-to-local-filesystem
         var svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">';
