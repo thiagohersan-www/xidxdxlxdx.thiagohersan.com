@@ -37,10 +37,10 @@ var Points = {
   averagePoint: Object.create(Vector).set(0,0),
   medianPoint: Object.create(Vector).set(0,0),
   standardDeviation: Object.create(Vector).set(0,0),
-  majorTopQuadrant: 0,
-  minorTopQuadrant: 0,
-  majorBottomQuadrant: 0,
-  minorBottomQuadrant: 0,
+  topMajorQuadrant: 0,
+  topMinorQuadrant: 0,
+  bottomMajorQuadrant: 0,
+  bottomMinorQuadrant: 0,
   quadrantLength: [0, 0, 0, 0],
 
   mQuadrants: [ [], [], [], [] ],
@@ -168,14 +168,12 @@ var Points = {
 
   update: function() {
     this.computeAverage();
-    this.computeMedian();
-    this.computeStandardDeviation();
     this.splitIntoQuadrants();
     this.computeAllQuadrantMedians();
 
-    this.majorTopQuadrant = (this.mQuadrants[0].length > this.mQuadrants[1].length)?0:1;
-    this.minorTopQuadrant = (this.majorTopQuadrant == 0)?1:0;
-    this.majorBottomQuadrant = (this.mQuadrants[2].length > this.mQuadrants[3].length)?2:3;
-    this.minorBottomQuadrant = (this.majorBottomQuadrant == 2)?3:2;
+    this.topMajorQuadrant = (this.mQuadrants[0].length > this.mQuadrants[1].length)?0:1;
+    this.topMinorQuadrant = (this.topMajorQuadrant == 0)?1:0;
+    this.bottomMajorQuadrant = (this.mQuadrants[2].length > this.mQuadrants[3].length)?2:3;
+    this.bottomMinorQuadrant = (this.bottomMajorQuadrant == 2)?3:2;
   }
 };

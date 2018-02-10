@@ -122,13 +122,13 @@
 
         var average = points.averagePoint;
 
-        var topMajorMedian = points.quadrantMedian[points.majorTopQuadrant];
-        var topMajorNearest = points.quadrantMinDistance[points.majorTopQuadrant];
-        var topMajorFurthest = points.quadrantMaxDistance[points.majorTopQuadrant];
+        var topMajorMedian = points.quadrantMedian[points.topMajorQuadrant];
+        var topMajorNearest = points.quadrantMinDistance[points.topMajorQuadrant];
+        var topMajorFurthest = points.quadrantMaxDistance[points.topMajorQuadrant];
 
-        var bottomMajorMedian = points.quadrantMedian[points.majorBottomQuadrant];
-        var bottomMajorNearest = points.quadrantMinDistance[points.majorBottomQuadrant];
-        var bottomMajorFurthest = points.quadrantMaxDistance[points.majorBottomQuadrant];
+        var bottomMajorMedian = points.quadrantMedian[points.bottomMajorQuadrant];
+        var bottomMajorNearest = points.quadrantMinDistance[points.bottomMajorQuadrant];
+        var bottomMajorFurthest = points.quadrantMaxDistance[points.bottomMajorQuadrant];
 
         var topMajorRadius = Object.create(Vector).set(
           Math.abs(topMajorMedian.x - topMajorFurthest.x),
@@ -138,13 +138,13 @@
           Math.abs(bottomMajorMedian.x - bottomMajorFurthest.x),
           Math.abs(bottomMajorMedian.y - bottomMajorFurthest.y));
 
-        var topMinorMedian = points.quadrantMedian[points.minorTopQuadrant];
-        var topMinorNearest = points.quadrantMinDistance[points.minorTopQuadrant];
-        var topMinorFurthest = points.quadrantMaxDistance[points.minorTopQuadrant];
+        var topMinorMedian = points.quadrantMedian[points.topMinorQuadrant];
+        var topMinorNearest = points.quadrantMinDistance[points.topMinorQuadrant];
+        var topMinorFurthest = points.quadrantMaxDistance[points.topMinorQuadrant];
 
-        var bottomMinorMedian = points.quadrantMedian[points.minorBottomQuadrant];
-        var bottomMinorNearest = points.quadrantMinDistance[points.minorBottomQuadrant];
-        var bottomMinorFurthest = points.quadrantMaxDistance[points.minorBottomQuadrant];
+        var bottomMinorMedian = points.quadrantMedian[points.bottomMinorQuadrant];
+        var bottomMinorNearest = points.quadrantMinDistance[points.bottomMinorQuadrant];
+        var bottomMinorFurthest = points.quadrantMaxDistance[points.bottomMinorQuadrant];
 
         var topMinorRadius = Object.create(Vector).set(
           Math.abs(topMinorMedian.x - topMinorFurthest.x),
@@ -161,8 +161,8 @@
                   bottomMinorFurthest,
                   bottomMinorMedian);
 
-        if(points.quadrantLength[points.majorTopQuadrant] >
-           points.quadrantLength[points.majorBottomQuadrant]) {
+        if(points.quadrantLength[points.topMajorQuadrant] >
+           points.quadrantLength[points.bottomMajorQuadrant]) {
           svgArc('glyph-svg', topMinorFurthest, bottomMinorNearest);
         } else {
           svgArc('glyph-svg', bottomMinorFurthest, bottomMinorNearest);
